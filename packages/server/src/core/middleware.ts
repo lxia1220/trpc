@@ -1,7 +1,8 @@
 import { TRPCError } from '../error/TRPCError';
 import { Simplify } from '../types';
-import { ParseFn } from './internals/getParseFn';
+import { ParseFn, getParseFn } from './internals/getParseFn';
 import { GetRawInputFn, MiddlewareMarker, Overwrite } from './internals/utils';
+import { Parser, ParserCallback, inferParser } from './parser';
 import { ProcedureType } from './types';
 
 /**
@@ -176,14 +177,23 @@ function isPlainObject(obj: unknown) {
  * @internal
  * Please note, `trpc-openapi` uses this function.
  */
-export function createInputMiddleware<TInput>(parse: ParseFn<TInput>) {
+export function createInputMiddleware<TContext, TParser extends Parser>(parse: ParserCallback<TContext, TParser> | TParser) {
   const inputMiddleware: AnyMiddlewareFunction =
     async function inputValidatorMiddleware(opts) {
-      let parsedInput: ReturnType<typeof parse>;
+      let parsedInput: inferParser<typeof parse>;
 
       const rawInput = await opts.getRawInput();
+
       try {
-        parsedInput = await parse(rawInput);
+        let parser: Parser;
+
+        if (typeof parse === 'function') {
+          parser = parse({ctx: opts.ctx});
+        } else {
+          parser = parse;
+        }
+
+        parsedInput = await getParseFn(parser)(rawInput) as any;
       } catch (cause) {
         throw new TRPCError({
           code: 'BAD_REQUEST',

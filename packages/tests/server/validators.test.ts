@@ -497,7 +497,7 @@ test('input callback', async () => {
     });
     const res = await ctx.client.num.query({ num: 123 });
 
-    expect(res.input).toBe(123);
+    expect(res.input.num).toBe(123);
     await ctx.close();
   }
 
@@ -516,7 +516,7 @@ test('input callback', async () => {
       TRPCClientError,
     );
 
-    expect(err).toMatchInlineSnapshot();
+    expect(err).toMatchInlineSnapshot('[TRPCClientError: Not expected context]');
 
     await ctx.close();
   }

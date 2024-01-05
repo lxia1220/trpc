@@ -33,11 +33,11 @@ type IntersectIfDefined<TType, TWith> = UnsetMarker extends TType
   ? TWith
   : Simplify<TType & TWith>;
 
-type ErrorMessage<TMessage extends string> = TMessage;
+// type ErrorMessage<TMessage extends string> = TMessage;
 
 export type ProcedureBuilderDef<TMeta> = {
   procedure: true;
-  inputs: Parser[];
+  inputs: (Parser | ParserCallback<any, Parser>)[];
   output?: Parser;
   meta?: TMeta;
   resolver?: ProcedureBuilderResolver;
@@ -133,12 +133,20 @@ export interface ProcedureBuilder<
    * @see https://trpc.io/docs/server/middlewares
    */
   use<$ContextOverridesOut>(
-    fn: MiddlewareBuilder<
-      Overwrite<TContext, TContextOverrides>,
-      TMeta,
-      $ContextOverridesOut,
-      TInputIn
-    >,
+    fn:
+      | MiddlewareBuilder<
+          Overwrite<TContext, TContextOverrides>,
+          TMeta,
+          $ContextOverridesOut,
+          TInputIn
+        >
+      | MiddlewareFunction<
+          TContext,
+          TMeta,
+          TContextOverrides,
+          $ContextOverridesOut,
+          TInputIn
+        >,
   ): ProcedureBuilder<
     TContext,
     TMeta,
@@ -258,10 +266,9 @@ export function createBuilder<TContext, TMeta>(
   const builder: AnyProcedureBuilder = {
     _def,
     input(input) {
-      const parser = getParseFn(input as Parser);
       return createNewBuilder(_def, {
-        inputs: [input as Parser],
-        middlewares: [createInputMiddleware(parser)],
+        inputs: [input],
+        middlewares: [createInputMiddleware(input)],
       });
     },
     output(output: Parser) {

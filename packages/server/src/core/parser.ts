@@ -52,11 +52,10 @@ export type ParserWithInputOutput<TInput, TParsedInput> = ParserZodEsque<
 export type Parser = ParserWithInputOutput<any, any> | ParserWithoutInput<any>;
 
 export type ParserCallback<TContext, TParser extends Parser> = (opts: {
-  input: unknown;
   ctx: TContext;
 }) => TParser;
 
-export type inferParser<TParser extends Parser> =
+export type inferParserInner<TParser extends Parser> =
   TParser extends ParserWithInputOutput<infer $TIn, infer $TOut>
     ? {
         in: Awaited<$TIn>;
@@ -69,9 +68,9 @@ export type inferParser<TParser extends Parser> =
       }
     : never;
 
-// export type inferParser<TParser extends Parser | ParserCallback<any, any>> =
-//   TParser extends ParserCallback<any, infer $Parser>
-//     ? inferParserInner<$Parser>
-//     : TParser extends Parser
-//     ? inferParserInner<TParser>
-//     : never;
+export type inferParser<TParser extends Parser | ParserCallback<any, any>> =
+  TParser extends ParserCallback<any, infer $Parser>
+    ? inferParserInner<$Parser>
+    : TParser extends Parser
+    ? inferParserInner<TParser>
+    : never;
