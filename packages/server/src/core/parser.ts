@@ -51,6 +51,13 @@ export type ParserWithInputOutput<TInput, TParsedInput> = ParserZodEsque<
 
 export type Parser = ParserWithInputOutput<any, any> | ParserWithoutInput<any>;
 
+/**
+ * ex)
+ * ({ctx}) => {
+ *    // Create a parser based on the context
+ *    return z.string()
+ * }
+ */
 export type ParserCallback<TContext, TParser extends Parser> = (opts: {
   ctx: TContext;
 }) => TParser;
