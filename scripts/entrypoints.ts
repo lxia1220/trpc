@@ -79,7 +79,7 @@ export function generateEntrypoints(inputs: string[]) {
         ...Array(importDepth).fill('..'),
         'dist',
         importPath,
-      );
+      ).replace(/\\/g, '/');
       // index.js
       const indexFile = path.resolve(importPath, 'index.js');
       const indexFileContent = `module.exports = require('${resolvedImport}');\n`;
