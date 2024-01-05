@@ -20,18 +20,27 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@trpc/server/src/': join(__dirname, '../server/src/'),
-      '@trpc/client/src/': join(__dirname, '../client/src/'),
-      '@trpc/react-query/src/': join(__dirname, '../react-query/src/'),
-      '@trpc/next/src/': join(__dirname, '../next/src/'),
+      '@trpc/server/src/': join(__dirname, '../server/src/').replace(
+        /\\/g,
+        '/',
+      ),
+      '@trpc/client/src/': join(__dirname, '../client/src/').replace(
+        /\\/g,
+        '/',
+      ),
+      '@trpc/react-query/src/': join(__dirname, '../react-query/src/').replace(
+        /\\/g,
+        '/',
+      ),
+      '@trpc/next/src/': join(__dirname, '../next/src/').replace(/\\/g, '/'),
       'vitest-environment-miniflare': join(
         __dirname,
         'node_modules/vitest-environment-miniflare',
-      ),
+      ).replace(/\\/g, '/'),
       '@vitest/coverage-istanbul': join(
         __dirname,
         'node_modules/@vitest/coverage-istanbul',
-      ),
+      ).replace(/\\/g, '/'),
     },
   },
 });
